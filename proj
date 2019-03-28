@@ -1,0 +1,30 @@
+PROJ=$1
+
+GITHUBUSER="jorgeviana"
+SEED="simple-java-seed"
+
+hub clone $GITHUBUSER/$SEED $PROJ
+cd $PROJ
+
+rm -rf .git/
+git init
+
+git add .
+git commit -m "initial commit"
+
+
+
+HAS_COLLABORATORS=$2
+[ "$HAS_COLLABORATORS" != "" ] || exit
+
+hub create
+git push origin master
+
+
+shift 1
+for COLLABORATOR in "$@"
+do 
+  hub api -X PUT repos/$GITHUBUSER/$PROJ/collaborators/$COLLABORATOR
+done
+
+echo "https://github.com/jorgeviana/$PROJ/invitations"
