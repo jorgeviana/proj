@@ -1,17 +1,32 @@
 #!/bin/bash
 
-perl -v &> /dev/null
-[ $? -eq 0 ] || { echo "perl is not installed"; exit 1; }
+function require {
+	cmd=$1
+	error_message=$2
 
-hub --version &> /dev/null
-[ $? -eq 0 ] || { echo "hub is not installed, visit https://github.com/github/hub"; exit 1; }
+	result=$($cmd &> /dev/null)
+	[ $? -eq 0 ] || { echo "$error_message"; exit 1; }
+}
 
-# proj myproj -s jorgeviana/simple-java-seed -c COL1 -c COL2 -g jorgeviana
+function require_not_empty {
+	var=$1
+	error_message=$2
+	[ "$var" != "" ] || { echo "$error_message"; exit 1; }
+}
 
-#PROJ="${1:-}"
+function require_file_not_exists {
+	var=$1
+	error_message=$2
+	[ -f "$PROJ" -o -d "$PROJ" ] && { echo "$error_message"; exit 1; }
+}
+
+require "perl -v"            "perl is not installed"
+require "hub --version"      "hub is not installed, visit https://github.com/github/hub"
+
+
 PROJ=$1
-[ "$PROJ" == "" ] && { echo "project name is mandatory"; exit 1; }
-[ -f "$PROJ" -o -d "$PROJ" ] && { echo "file or directory \"$PROJ\" already exists"; exit 1; }
+require_not_empty "$PROJ"            "project name is mandatory"
+require_file_not_exists "$PROJ"      "file or directory \"$PROJ\" already exists"
 
 MY_GITHUB_USERNAME=$( perl -ne 'print "$1" if /user: (.*?)\n/' ~/.config/hub )
 
