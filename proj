@@ -1,5 +1,8 @@
 #!/bin/bash
 
+perl -v &> /dev/null
+[ $? -eq 0 ] || { echo "perl is not installed"; exit 1; }
+
 hub --version &> /dev/null
 [ $? -eq 0 ] || { echo "hub is not installed, visit https://github.com/github/hub"; exit 1; }
 
